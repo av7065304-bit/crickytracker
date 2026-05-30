@@ -1,0 +1,6 @@
+{
+  "name": "CricEdge AI",
+  "description": "Premium cricket intelligence, live analysis, AI-powered match prediction, interactive fantasy optimizer, head-to-head match-up stats, and cricket chat virtual assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
