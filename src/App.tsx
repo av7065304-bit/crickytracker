@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SAMPLE_MATCH, LANGUAGE_PACKS, LOCAL_PLAYERS, LOCAL_TEAMS } from './data';
 import LiveMatchCenter from './components/LiveMatchCenter';
 import PlayerView from './components/PlayerView';
@@ -15,14 +15,29 @@ import FantasyBuilder from './components/FantasyBuilder';
 import OddsAnalytics from './components/OddsAnalytics';
 import GamificationEngine from './components/GamificationEngine';
 import DashboardAndSettings from './components/DashboardAndSettings';
+import NotificationOverlay from './components/NotificationOverlay';
+import ThreeDBackground from './components/ThreeDBackground';
 import { 
   Trophy, Activity, Users, MapPin, Sparkles, Bot, LineChart, 
-  Settings, Award, Globe, Newspaper, Info, HelpCircle, ChevronRight, Calendar
+  Settings, Award, Globe, Newspaper, Info, HelpCircle, ChevronRight, Calendar,
+  Sun, Moon
 } from 'lucide-react';
 
 export default function App() {
   const [currentTab, setCurrentTab] = useState<'home' | 'live' | 'players' | 'teams' | 'stadiums' | 'predictor' | 'gpt' | 'fantasy' | 'odds' | 'ranks'>('home');
   const [language, setLanguage] = useState<string>('English');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  // Synchronize CSS class with document body for global theme overlays
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.body.classList.add('dark-theme');
+      document.body.classList.remove('light-theme');
+    } else {
+      document.body.classList.add('light-theme');
+      document.body.classList.remove('dark-theme');
+    }
+  }, [theme]);
   
   // Selected translation package
   const langPack = LANGUAGE_PACKS[language] || LANGUAGE_PACKS.English;
@@ -58,10 +73,11 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] text-[#1A1A1A] font-sans flex flex-col antialiased">
+    <div className={`relative min-h-screen font-sans flex flex-col antialiased transition-colors duration-300 ${theme === 'dark' ? 'bg-[#060a13] text-slate-100' : 'bg-[#F4F6F8]/85 text-[#1A1A1A]'}`}>
+      <ThreeDBackground theme={theme} />
       
       {/* Top Universal Sports Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-white border-b border-slate-200/80 shadow-xs backdrop-blur-md bg-white/95 h-20 flex items-center">
+      <header className={`sticky top-0 z-50 border-b shadow-xs backdrop-blur-md h-20 flex items-center transition-all duration-300 ${theme === 'dark' ? 'bg-slate-950/85 border-slate-800/80 text-white' : 'bg-white/95 border-slate-200/80 text-slate-900'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex items-center justify-between">
           
           {/* Logo Brand area */}
@@ -73,22 +89,22 @@ export default function App() {
               C
             </div>
             <div>
-              <span className="text-xl font-bold text-slate-900 block font-sans tracking-tight">
-                CricEdge <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-sky-500 font-extrabold">AI</span>
+              <span className={`text-xl font-bold block font-sans tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+                CricEdge <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-sky-400 font-extrabold">AI</span>
               </span>
-              <span className="text-[10px] font-semibold text-slate-400 block tracking-wider uppercase">Sports intelligence hub</span>
+              <span className={`text-[10px] font-semibold block tracking-wider uppercase ${theme === 'dark' ? 'text-slate-450' : 'text-slate-400'}`}>Sports intelligence hub</span>
             </div>
           </div>
 
           {/* Quick Stats Tick line */}
-          <div className="hidden lg:flex items-center gap-6 text-xs text-slate-500 font-mono">
+          <div className={`hidden lg:flex items-center gap-6 text-xs font-mono ${theme === 'dark' ? 'text-slate-400' : 'text-slate-500'}`}>
             <span className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-              Live: <b className="font-bold text-slate-800">IND 298/4 (42.2)</b>
+              Live: <b className={`font-bold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-800'}`}>IND 298/4 (42.2)</b>
             </span>
-            <span>Target: <b className="font-bold text-slate-800">315</b></span>
-            <span>Venue: <b className="font-bold text-slate-800">Wankhede (Red Soil)</b></span>
-            <span className="flex items-center gap-1.5 px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-[10px] font-bold border border-purple-100">
+            <span>Target: <b className={`font-bold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-800'}`}>315</b></span>
+            <span>Venue: <b className={`font-bold ${theme === 'dark' ? 'text-slate-200' : 'text-slate-800'}`}>Wankhede (Red Soil)</b></span>
+            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold border transition ${theme === 'dark' ? 'bg-purple-950/40 text-purple-300 border-purple-900/60' : 'bg-purple-50 text-purple-700 border-purple-100'}`}>
               <span className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse"></span>
               AI PRO ENABLED
             </span>
@@ -96,15 +112,36 @@ export default function App() {
 
           {/* Settings & locales shortcuts */}
           <div className="flex items-center gap-3">
+            {/* Dynamic Theme switcher button */}
+            <button
+              onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+              className={`p-2 rounded-xl transition relative border cursor-pointer ${
+                theme === 'dark' 
+                  ? 'bg-slate-900 hover:bg-slate-800 text-yellow-400 border-slate-800' 
+                  : 'bg-slate-50 hover:bg-slate-100 text-purple-600 border-slate-200'
+              }`}
+              title={theme === 'dark' ? 'Switch to Classic Light Theme' : 'Switch to Cyber Stadium Dark Theme'}
+            >
+              {theme === 'dark' ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+            </button>
+
             <button
               onClick={() => setCurrentTab('ranks')}
-              className="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-500 transition relative"
+              className={`p-2 rounded-xl transition relative border cursor-pointer ${
+                theme === 'dark' 
+                  ? 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800' 
+                  : 'bg-slate-50 hover:bg-slate-100 text-slate-500 border-slate-200'
+              }`}
               title="Dashboard Preferences"
             >
               <Settings className="h-4.5 w-4.5" />
             </button>
 
-            <span className="text-xs bg-slate-50 text-slate-700 border border-slate-100 font-mono font-bold px-2.5 py-1 rounded-lg hidden sm:inline-block">
+            <span className={`text-xs border font-mono font-bold px-2.5 py-1 rounded-lg hidden sm:inline-block transition ${
+              theme === 'dark' 
+                ? 'bg-slate-950 text-slate-300 border-slate-800' 
+                : 'bg-slate-50 text-slate-700 border-slate-100'
+            }`}>
               🌐 {language}
             </span>
           </div>
@@ -113,7 +150,7 @@ export default function App() {
       </header>
 
       {/* Primary Category Selector Tab rail bar */}
-      <div className="bg-white border-b border-slate-200/80 overflow-x-auto scrollbar-none py-2 sticky top-20 z-40">
+      <div className={`border-b overflow-x-auto scrollbar-none py-2 sticky top-20 z-40 transition-all duration-300 ${theme === 'dark' ? 'bg-slate-950/90 border-slate-800/80 shadow-md' : 'bg-white border-slate-200/80 shadow-xs'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex gap-2">
           
           {[
@@ -134,7 +171,13 @@ export default function App() {
               <button
                 key={tab.id}
                 onClick={() => setCurrentTab(tab.id as any)}
-                className={`py-2 px-3.5 text-xs font-bold rounded-xl transition-all duration-150 flex items-center gap-1.5 shrink-0 select-none cursor-pointer ${isActive ? 'bg-slate-900 text-white font-extrabold shadow-sm' : tab.highlight ? 'bg-purple-50 text-purple-700 border border-purple-100 hover:bg-purple-100/60' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}`}
+                className={`py-2 px-3.5 text-xs font-bold rounded-xl transition-all duration-150 flex items-center gap-1.5 shrink-0 select-none cursor-pointer ${
+                  isActive 
+                    ? (theme === 'dark' ? 'bg-white text-slate-950 font-extrabold shadow-sm' : 'bg-slate-800 text-white font-extrabold shadow-sm') 
+                    : tab.highlight 
+                      ? (theme === 'dark' ? 'bg-purple-950/50 text-purple-300 border border-purple-900/40 hover:bg-purple-900/50' : 'bg-purple-50 text-purple-700 border border-purple-100 hover:bg-purple-100/60') 
+                      : (theme === 'dark' ? 'text-slate-400 hover:text-white hover:bg-slate-900/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50')
+                }`}
               >
                 <Icon className="h-3.5 w-3.5" />
                 <span>{tab.label}</span>
@@ -151,7 +194,7 @@ export default function App() {
       </div>
 
       {/* Main Core Layout Panels container */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+      <main className="relative z-10 flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
         
         {currentTab === 'home' && (
           <div className="space-y-8">
@@ -336,7 +379,7 @@ export default function App() {
           </div>
         )}
 
-        {currentTab === 'live' && <LiveMatchCenter />}
+        {currentTab === 'live' && <LiveMatchCenter theme={theme} />}
         {currentTab === 'players' && <PlayerView />}
         {currentTab === 'teams' && <TeamSelector />}
         {currentTab === 'stadiums' && <VenueToss />}
@@ -354,7 +397,7 @@ export default function App() {
       </main>
 
       {/* Elegant minimalist footer */}
-      <footer className="bg-white border-t border-gray-100 mt-20">
+      <footer className="relative z-10 bg-white border-t border-gray-100 mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-gray-450 text-gray-500 font-mono">
           <p>© 2026 CricEdge AI Sports, Inc. All Rights Reserved. Pure Cricket Intelligence.</p>
           <div className="flex gap-4">
@@ -365,6 +408,7 @@ export default function App() {
         </div>
       </footer>
 
+      <NotificationOverlay />
     </div>
   );
 }
